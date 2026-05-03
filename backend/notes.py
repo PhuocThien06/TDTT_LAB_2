@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, HTTPException
 from firebase_config import db
 from datetime import datetime
 from auth import verify_token
-from fastapi import HTTPException
 
 router = APIRouter()
 
@@ -19,6 +18,7 @@ def create_note(content: str, authorization: str = Header(...)):
     db.collection("notes").add(note)
     return {"message": "Note saved"}
 
+
 @router.get("/notes")
 def get_notes(authorization: str = Header(...)):
     user_id = verify_token(authorization)
@@ -27,11 +27,12 @@ def get_notes(authorization: str = Header(...)):
 
     result = []
     for doc in docs:
-    	data = doc.to_dict()
-        data["id"] = doc.id   
-    	result.append(data)
+        data = doc.to_dict()
+        data["id"] = doc.id
+        result.append(data)
 
     return result
+
 
 @router.delete("/notes/{note_id}")
 def delete_note(note_id: str, authorization: str = Header(...)):
@@ -45,7 +46,6 @@ def delete_note(note_id: str, authorization: str = Header(...)):
 
     data = doc.to_dict()
 
-    # kiểm tra quyền (quan trọng)
     if data["user_id"] != user_id:
         raise HTTPException(status_code=403, detail="Not allowed")
 

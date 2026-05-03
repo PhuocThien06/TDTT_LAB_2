@@ -31,6 +31,7 @@ if st.button("Login"):
         st.session_state.token = data["idToken"]
         st.session_state.email = data["email"]
         st.success("Login thành công!")
+        st.rerun()
     else:
         st.error("Sai tài khoản hoặc mật khẩu")
 
@@ -64,40 +65,41 @@ if st.session_state.token:
             if res.status_code == 200:
                 st.success("✅ Lưu note thành công!")
                 st.toast("Đã lưu ghi chú 🎉")
+                st.rerun()
             else:
                 st.error("❌ Lỗi khi lưu note")
 
     # DANH SÁCH NOTE
     st.subheader("Danh sách ghi chú")
 
-    if st.button("Tải danh sách"):
-        res = requests.get(
-            f"{BACKEND_URL}/notes",
-            headers=headers
-        )
+    res = requests.get(
+        f"{BACKEND_URL}/notes",
+        headers=headers
+    )
 
-        if res.status_code == 200:
-            data = res.json()
+    if res.status_code == 200:
+        data = res.json()
 
-            if len(data) == 0:
-                st.info("📭 Chưa có ghi chú")
-            else:
-                for note in data:
-                    st.markdown(f"### 📝 {note['content']}")
-                    st.caption(f"⏱ {note['created_at']}")
-
-                    if st.button("❌ Xóa", key=note["id"]):
-                        res = requests.delete(
-                            f"{BACKEND_URL}/notes/{note['id']}",
-                            headers=headers
-                        )
-
-                        if res.status_code == 200:
-                            st.success("Đã xóa")
-                            st.rerun()
-                        else:
-                            st.error("Không xóa được")
-
-                    st.divider()
+        if len(data) == 0:
+            st.info("📭 Chưa có ghi chú")
         else:
-            st.error("❌ Không tải được danh sách")
+            for note in data:
+                st.markdown(f"### 📝 {note['content']}")
+                st.caption(f"⏱ {note['created_at']}")
+
+                if st.button("❌ Xóa", key=note["id"]):
+                    res = requests.delete(
+                        f"{BACKEND_URL}/notes/{note['id']}",
+                        headers=headers
+                    )
+
+                    if res.status_code == 200:
+                        st.success("Đã xóa")
+                        st.toast("Đã xóa 🗑️")
+                        st.rerun()
+                    else:
+                        st.error("Không xóa được")
+
+                st.divider()
+    else:
+        st.error("❌ Không tải được danh sách")
