@@ -183,7 +183,6 @@ http://127.0.0.1:8000/docs
 Link:
 ```
 https://drive.google.com/drive/folders/1hayK6I6SHxzabEbjN9GD5dUXOJvAEQWt
-```
 
 ---
 
